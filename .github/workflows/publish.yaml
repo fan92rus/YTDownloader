@@ -1,0 +1,66 @@
+name: Build, Version, and Push (sln-based image name)
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    env:
+      REGISTRY: ghcr.io
+      OWNER: ${{ github.repository_owner }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Find .sln file and extract project name
+        id: sln
+        run: |
+          SLN_FILE=$(find . -maxdepth 1 -name "*.sln" | head -n 1)
+          if [ -z "$SLN_FILE" ]; then
+            echo "No .sln file found in the root." >&2
+            exit 1
+          fi
+          SLN_NAME=$(basename "$SLN_FILE" .sln)
+          IMAGE_NAME=$(echo "$SLN_NAME" | tr '[:upper:]' '[:lower:]')
+          echo "sln_name=$SLN_NAME" >> $GITHUB_OUTPUT
+          echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
+
+      - name: Get version from last Git tag + Unix timestamp
+        id: semver
+        run: |
+          TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          TIMESTAMP=$(date +%s)
+          VERSION="${TAG}-${TIMESTAMP}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: |
+          IMAGE=$REGISTRY/${OWNER}/${{ steps.sln.outputs.image_name }}
+          docker build -t $IMAGE:${{ steps.semver.outputs.version }} .
+
+      - name: Push image with version tag
+        run: |
+          IMAGE=$REGISTRY/${OWNER}/${{ steps.sln.outputs.image_name }}
+          docker push $IMAGE:${{ steps.semver.outputs.version }}
+
+      - name: Tag image as latest
+        run: |
+          IMAGE=$REGISTRY/${OWNER}/${{ steps.sln.outputs.image_name }}
+          docker tag $IMAGE:${{ steps.semver.outputs.version }} $IMAGE:latest
+
+      - name: Push image with latest tag
+        run: |
+          IMAGE=$REGISTRY/${OWNER}/${{ steps.sln.outputs.image_name }}
+          docker push $IMAGE:latest

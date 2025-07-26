@@ -1,0 +1,51 @@
+@page "/cookies"
+@rendermode InteractiveServer
+
+<PageTitle>Cookie Manager</PageTitle>
+
+<div class="container">
+    <h1>Управление куками</h1>
+    <textarea id="cookieText" @bind="cookieContent" rows="20" cols="80" placeholder="Вставьте содержимое файла cookies.txt"></textarea>
+    <br>
+    <button @onclick="SaveCookies">Сохранить куки</button>
+    <div class="progress" id="statusMessage">@saveStatus</div>
+</div>
+
+@code {
+    private string cookieContent = "";
+    private string saveStatus = "";
+    private string cookiePath = Environment.GetEnvironmentVariable("COOKIE_PATH") ?? "/app/data/cookie.txt";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCookies();
+    }
+
+    private async Task LoadCookies()
+    {
+        try
+        {
+            if (System.IO.File.Exists(cookiePath))
+            {
+                cookieContent = await System.IO.File.ReadAllTextAsync(cookiePath);
+            }
+        }
+        catch (Exception ex)
+        {
+            saveStatus = $"Ошибка загрузки кук: {ex.Message}";
+        }
+    }
+
+    private async Task SaveCookies()
+    {
+        try
+        {
+            await System.IO.File.WriteAllTextAsync(cookiePath, cookieContent);
+            saveStatus = "Куки успешно сохранены!";
+        }
+        catch (Exception ex)
+        {
+            saveStatus = $"Ошибка сохранения кук: {ex.Message}";
+        }
+    }
+}
