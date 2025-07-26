@@ -1,0 +1,71 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@inject NavigationManager Navigation
+
+<PageTitle>Video Downloader</PageTitle>
+
+<div class="container">
+    <h1>Скачать видео с YouTube</h1>
+    <input type="text" id="videoUrl" @bind="videoUrl" @bind:after="ValidateUrl" placeholder="Введите ссылку на видео"/>
+    <div class="download-options">
+        <label>
+            <input type="checkbox" id="audioOnly" @bind="isAudioOnly"/>
+            Скачать только аудио (MP3)
+        </label>
+    </div>
+    <button type="button" onclick="@DownloadVideo">Скачать</button>
+
+    @if (!string.IsNullOrWhiteSpace(statusMessage))
+    {
+        <div class="progress" id="progressMessage">@statusMessage</div>
+    }
+</div>
+
+
+@code {
+    private string videoUrl = string.Empty;
+    private string statusMessage = "";
+    private bool isAudioOnly = false;
+
+    protected override void OnInitialized()
+    {
+        // Check if URL has been passed as query parameter
+        var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+        if (uri.Query.Contains("url="))
+        {
+            var queryParam = uri.Query.Split(new[] { "&" }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var param in queryParam)
+            {
+                if (param.StartsWith("url=", StringComparison.OrdinalIgnoreCase))
+                {
+                    videoUrl = System.Net.WebUtility.UrlDecode(param.Substring(4));
+                    break;
+                }
+            }
+        }
+    }
+
+    private void ValidateUrl()
+    {
+        if (string.IsNullOrWhiteSpace(videoUrl))
+        {
+            statusMessage = "Введите URL видео.";
+        }
+        else
+        {
+            statusMessage = string.Empty;
+        }
+    }
+
+    private void DownloadVideo()
+    {
+        if (string.IsNullOrWhiteSpace(videoUrl))
+        {
+            statusMessage = "Введите URL видео.";
+            return;
+        }
+
+        Navigation.NavigateTo($"api/download/stream?url={Uri.EscapeDataString(videoUrl)}&audioOnly={isAudioOnly}", true);
+    }
+
+}

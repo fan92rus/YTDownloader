@@ -1,0 +1,76 @@
+name: Build, Version, and Push (sln-based image name)
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    env:
+      REGISTRY: 192.168.2.96:3005/${{ secrets.LOCAL_REGISTRY_USER }}  # <== ТУТ задаём переменную реестра
+      REGISTRY_USER: ${{ secrets.LOCAL_REGISTRY_USER }}    # <-- добавь сюда свой логин Gitea
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Find .sln file and extract project name
+      id: sln
+      run: |
+        SLN_FILE=$(find . -maxdepth 1 -name "*.sln" | head -n 1)
+        if [ -z "$SLN_FILE" ]; then
+          echo "No .sln file found in the root." >&2
+          exit 1
+        fi
+        SLN_NAME=$(basename "$SLN_FILE" .sln)
+        IMAGE_NAME=$(echo "$SLN_NAME" | tr '[:upper:]' '[:lower:]')
+        echo "sln_name=$SLN_NAME" >> $GITHUB_OUTPUT
+        echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
+
+    - name: Get version from last Git tag + Unix timestamp
+      id: semver
+      run: |
+        TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+        TIMESTAMP=$(date +%s)
+        VERSION="${TAG}-${TIMESTAMP}"
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+    - name: Login to local registry (if needed)
+      if: ${{ secrets.LOCAL_REGISTRY_USER != '' }}
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ secrets.LOCAL_REGISTRY_USER }}
+        password: ${{ secrets.LOCAL_REGISTRY_PASS }}
+
+    - name: Build Docker image
+      run: |
+        docker build -t $REGISTRY/${{ steps.sln.outputs.image_name }}:${{ steps.semver.outputs.version }} .
+
+    - name: Push image with version tag
+      run: |
+        docker push $REGISTRY/${{ steps.sln.outputs.image_name }}:${{ steps.semver.outputs.version }}
+
+    - name: Tag image as latest
+      run: |
+        docker tag $REGISTRY/${{ steps.sln.outputs.image_name }}:${{ steps.semver.outputs.version }} $REGISTRY/${{ steps.sln.outputs.image_name }}:latest
+
+    - name: Push image with latest tag
+      run: |
+        docker push $REGISTRY/${{ steps.sln.outputs.image_name }}:latest
+
+    - name: Sleep for 10 seconds
+      run: sleep 10s
+      shell: bash
+        
+    - name: Deploy stack to Portainer
+      uses: carlrygart/portainer-stack-deploy@v1
+      with:
+        portainer-host: http://192.168.2.96:3040
+        username: ${{ secrets.PORTAINER_USERNAME }}
+        password: ${{ secrets.PORTAINER_PASSWORD }}
+        stack-name: 'ytrdownloader'
+        stack-definition: 'stack-definition.yml'
