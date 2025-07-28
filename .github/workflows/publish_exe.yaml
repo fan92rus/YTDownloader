@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # ✅ Переключение на Linux runner
+    runs-on: windows-latest
 
     steps:
       - name: Checkout source
@@ -25,19 +25,16 @@ jobs:
         run: dotnet restore
 
       - name: Build Release
-        run: |
-          dotnet publish -c Release -r linux-x64 --self-contained true \
-            -p:PublishSingleFile=true \
-            -p:IncludeNativeLibrariesForSelfExtract=true \
-            -o out
+        run: dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o out
 
       - name: Create data folder
-        run: |
-            mkdir -p out/data
-            ls out/data
+        run: New-Item -ItemType File -Path ./out/data/cookie.txt
+
+      - name: Add dummy file to data folder
+        run: New-Item -ItemType File -Path ./out/data/.keep
 
       - name: Archive executable
-        run: zip -r yt_downloader.zip out
+        run: Compress-Archive -Path ./out/* -DestinationPath yt_downloader.zip
 
       - name: Upload Release Artifact
         uses: softprops/action-gh-release@v2
