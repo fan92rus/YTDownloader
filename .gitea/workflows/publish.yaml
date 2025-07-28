@@ -30,13 +30,8 @@ jobs:
         echo "sln_name=$SLN_NAME" >> $GITHUB_OUTPUT
         echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
 
-    - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '8.0.x'
-
-    - name: Setup GitVersion
-      uses: gittools/actions/gitversion/setup@v1
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v4.0.1
       with:
         versionSpec: '6.3.x'
 
