@@ -8,8 +8,6 @@ namespace YT_Downloader.Controllers
     [ApiController]
     public class DownloadController : ControllerBase
     {
-        private readonly string _videoFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "videos");
-
         [HttpGet("stream")]
         public async Task<IActionResult> StreamVideo([FromQuery] string url, [FromQuery] bool audioOnly = false)
         {
