@@ -6,10 +6,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers(); // Register DownloadController as a controller
 // Register the hosted service with dependency injection
 builder.Services.AddSingleton<ICookieManager, CookieManager>();
+builder.Services.AddScoped<DownloadHandler>(); // Register DownloadHandler as a scoped service
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
