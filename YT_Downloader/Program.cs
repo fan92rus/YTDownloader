@@ -1,10 +1,11 @@
 using YT_Downloader.Components;
+using YT_Downloader.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers(); // Register DownloadController as a controller
 // Register the hosted service with dependency injection
-
+builder.Services.AddSingleton<ICookieManager, CookieManager>();
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
@@ -30,4 +31,3 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
 app.Run();
-

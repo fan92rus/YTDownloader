@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Text;
+using YT_Downloader.Services;
 
 namespace YT_Downloader.Controllers
 {
@@ -8,6 +9,13 @@ namespace YT_Downloader.Controllers
     [ApiController]
     public class DownloadController : ControllerBase
     {
+        private readonly ICookieManager _cookieService;
+
+        public DownloadController(ICookieManager cookieService)
+        {
+            _cookieService = cookieService;
+        }
+
         [HttpGet("stream")]
         public async Task<IActionResult> StreamVideo([FromQuery] string url, [FromQuery] bool audioOnly = false)
         {
@@ -20,13 +28,14 @@ namespace YT_Downloader.Controllers
 
             var client = new HttpClient();
             var page = client.GetAsync(url).Result;
-            string htmlContent = await page.Content.ReadAsStringAsync();
+            var htmlContent = await page.Content.ReadAsStringAsync();
 
-            string title = string.Empty;
-            int titleStartIndex = htmlContent.IndexOf("<title>", StringComparison.OrdinalIgnoreCase);
+            var title = string.Empty;
+            var titleStartIndex = htmlContent.IndexOf("<title>", StringComparison.OrdinalIgnoreCase);
+
             if (titleStartIndex != -1)
             {
-                int titleEndIndex =
+                var titleEndIndex =
                     htmlContent.IndexOf("</title>", titleStartIndex, StringComparison.OrdinalIgnoreCase);
                 if (titleEndIndex != -1)
                 {
@@ -37,13 +46,13 @@ namespace YT_Downloader.Controllers
 
             Console.WriteLine($"Page Title: {title}");
 
-            var cookiePath = Environment.GetEnvironmentVariable("COOKIE_PATH") ?? "./data/cookie.txt";
+            var cookiePath = _cookieService.GetCookiePath();
 
             try
             {
-                string extension = audioOnly ? "m4a" : "mp4";
-                string encodedFileName = Uri.EscapeDataString($"{title}.{extension}");
-                string formatSelector = audioOnly ? "bestaudio[ext=m4a]" : "best[ext=mp4]";
+                var extension = audioOnly ? "m4a" : "mp4";
+                var encodedFileName = Uri.EscapeDataString($"{title}.{extension}");
+                var formatSelector = audioOnly ? "bestaudio[ext=m4a]" : "best[ext=mp4]";
 
                 // Set response headers for streaming
                 Response.Headers.Append("Content-Disposition", $"attachment; filename=\"{encodedFileName}\"");

@@ -1,5 +1,7 @@
 @page "/cookies"
 @rendermode InteractiveServer
+@using YT_Downloader.Services
+@inject ICookieManager CookieService
 
 <PageTitle>Cookie Manager</PageTitle>
 
@@ -14,7 +16,6 @@
 @code {
     private string cookieContent = "";
     private string saveStatus = "";
-    private string cookiePath = Environment.GetEnvironmentVariable("COOKIE_PATH") ?? "./data/cookie.txt";
 
     protected override async Task OnInitializedAsync()
     {
@@ -25,10 +26,7 @@
     {
         try
         {
-            if (System.IO.File.Exists(cookiePath))
-            {
-                cookieContent = await System.IO.File.ReadAllTextAsync(cookiePath);
-            }
+            cookieContent = await CookieService.LoadCookiesAsync();
         }
         catch (Exception ex)
         {
@@ -40,7 +38,7 @@
     {
         try
         {
-            await System.IO.File.WriteAllTextAsync(cookiePath, cookieContent);
+            await CookieService.SaveCookiesAsync(cookieContent);
             saveStatus = "Куки успешно сохранены!";
         }
         catch (Exception ex)
