@@ -25,7 +25,7 @@ A Blazor application for downloading videos from YouTube.
 
 2. Run the container with cookie folder mounted:
    ```
-   docker run -d -p 8080:80 --name ytdownloader_container -v ./data:/app/data ghcr.io/fan92rus/yt_downloader:latest
+   docker run -d -p 8080:8080 --name ytdownloader_container -v ./data:/app/data ghcr.io/fan92rus/yt_downloader:latest
    ```
 
 3. Open your browser and navigate to `http://localhost:8080`
@@ -38,7 +38,7 @@ A Blazor application for downloading videos from YouTube.
      ytdownloader:
        image: ghcr.io/fan92rus/yt_downloader:latest
        ports:
-         - "8080:80"
+         - "8080:8080"
        volumes:
          - ./data:/app/data
    ```
@@ -58,7 +58,7 @@ A Blazor application for downloading videos from YouTube.
 
 2. Run the container with cookie folder mounted:
    ```
-   docker run -d -p 8080:80 --name ytdownloader_container -v ./data:/app/data ytdownloader
+   docker run -d -p 8080:8080 --name ytdownloader_container -v ./data:/app/data ytdownloader
    ```
 
 3. Open your browser and navigate to `http://localhost:8080`
@@ -81,7 +81,7 @@ The application provides a dedicated page for cookie management at `/cookie`. Th
 4. Save your current session cookies (useful for YouTube authentication)
 
 To access the cookie manager:
-1. Navigate to `https://localhost:8080/cookie` in your browser
+1. Navigate to `https://localhost:8080/cookies` in your browser
 2. Use the provided interface to manage your cookies
 
 ## Contributing

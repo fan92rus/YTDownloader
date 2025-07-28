@@ -21,7 +21,7 @@
 
 2. Запустите контейнер с подключенной папкой для куки:
    ```
-   docker run -d -p 8080:80 --name ytdownloader_container -v ./data:/app/data ghcr.io/fan92rus/yt_downloader:latest
+   docker run -d -p 8080:8080 --name ytdownloader_container -v ./data:/app/data ghcr.io/fan92rus/yt_downloader:latest
    ```
 
 3. Откройте браузер и перейдите по адресу `http://localhost:8080`
@@ -34,7 +34,7 @@
      ytdownloader:
        image: ghcr.io/fan92rus/yt_downloader:latest
        ports:
-         - "8080:80"
+         - "8080:8080"
        volumes:
          - ./data:/app/data
    ```
@@ -54,7 +54,7 @@
 
 2. Запустите контейнер с подключенной папкой для куки:
    ```
-   docker run -d -p 8080:80 --name ytdownloader_container -v ./data:/app/data ytdownloader
+   docker run -d -p 8080:8080 --name ytdownloader_container -v ./data:/app/data ytdownloader
    ```
 
 3. Откройте браузер и перейдите по адресу `http://localhost:8080`
@@ -77,7 +77,7 @@
 4. Сохранять ваши текущие сессионные куки (полезно для аутентификации на YouTube)
 
 Для доступа к менеджеру куки:
-1. Перейдите по адресу `https://localhost:8080/cookie` в вашем браузере
+1. Перейдите по адресу `https://localhost:8080/cookies` в вашем браузере
 2. Используйте предоставленный интерфейс для управления куки
 
 ## Вклад в проект
