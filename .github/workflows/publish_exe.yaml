@@ -2,11 +2,8 @@ name: Build and Release .NET App
 
 on:
   push:
-    branches:
-      - master
     tags:
       - 'v*'  # Запускается при пуше тега v1.0.0 и т.п.
-  workflow_dispatch:
 
 jobs:
   build:

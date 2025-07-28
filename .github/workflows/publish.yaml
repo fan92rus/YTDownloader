@@ -2,9 +2,8 @@ name: Build, Version, and Push (sln-based image name)
 
 on:
   push:
-    branches:
-      - master
-  workflow_dispatch:
+    tags:
+      - 'v*'  # Запускается при пуше тега v1.0.0 и т.п.
 
 permissions:
   packages: write
@@ -34,19 +33,13 @@ jobs:
           echo "sln_name=$SLN_NAME" >> $GITHUB_OUTPUT
           echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
 
-      - name: Setup GitVersion
-        uses: gittools/actions/gitversion/setup@v1
-        with:
-          versionSpec: '6.3.x'
-
-      - name: Run GitVersion
-        id: gitversion
-        uses: gittools/actions/gitversion/execute@v1
-
-      - name: Set version output
+      - name: Get version from last Git tag + Unix timestamp
         id: semver
         run: |
-          echo "version=${{ steps.gitversion.outputs.fullSemVer }}" >> $GITHUB_OUTPUT
+          TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          TIMESTAMP=$(date +%s)
+          VERSION="${TAG}-${TIMESTAMP}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v2
