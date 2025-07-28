@@ -14,7 +14,7 @@
 @code {
     private string cookieContent = "";
     private string saveStatus = "";
-    private string cookiePath = Environment.GetEnvironmentVariable("COOKIE_PATH") ?? "/app/data/cookie.txt";
+    private string cookiePath = Environment.GetEnvironmentVariable("COOKIE_PATH") ?? "./data/cookie.txt";
 
     protected override async Task OnInitializedAsync()
     {
