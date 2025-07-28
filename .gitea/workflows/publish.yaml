@@ -30,20 +30,13 @@ jobs:
         echo "sln_name=$SLN_NAME" >> $GITHUB_OUTPUT
         echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
 
-    - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v4.0.1
-      with:
-        versionSpec: '6.3.x'
-
-    - name: Run GitVersion
-      id: gitversion
-      uses: gittools/actions/gitversion/execute@v1
-
-    - name: Set version output
+    - name: Get version from last Git tag + Unix timestamp
       id: semver
       run: |
-        echo "version=${{ steps.gitversion.outputs.fullSemVer }}" >> $GITHUB_OUTPUT
-
+        TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+        TIMESTAMP=$(date +%s)
+        VERSION="${TAG}-${TIMESTAMP}"
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
 
     - name: Login to local registry (if needed)
       if: ${{ secrets.LOCAL_REGISTRY_USER != '' }}
