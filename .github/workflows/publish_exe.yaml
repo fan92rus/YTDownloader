@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*'  # Запускается при пуше тега v1.0.0 и т.п.
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: windows-latest
