@@ -16,9 +16,10 @@ namespace YT_Downloader.Services
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
-            if (string.IsNullOrWhiteSpace(url))
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var uriResult) ||
+                !(uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps))
             {
-                throw new ArgumentException("URL parameter is required");
+                throw new ArgumentException("Invalid URL format. Only HTTP and HTTPS URLs are supported.");
             }
 
             var process = new Process
@@ -26,7 +27,7 @@ namespace YT_Downloader.Services
                 StartInfo = new ProcessStartInfo
                 {
                     FileName = "yt-dlp",
-                    Arguments = $"{url} --get-filename -o \"%(title)s\"",
+                    ArgumentList = { $"{url}", "--get-filename", "-o", "\"%(title)s\"" },
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
                     CreateNoWindow = true
@@ -42,6 +43,12 @@ namespace YT_Downloader.Services
 
         public async Task<Stream> GetDataStream(string url, string title, bool audioOnly)
         {
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var uriResult) ||
+                !(uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps))
+            {
+                throw new ArgumentException("Invalid URL format. Only HTTP and HTTPS URLs are supported.");
+            }
+
             var cookiePath = _cookieService.GetCookiePath();
 
             try
@@ -54,7 +61,7 @@ namespace YT_Downloader.Services
                     StartInfo = new ProcessStartInfo
                     {
                         FileName = "yt-dlp",
-                        Arguments = $"{url} -o - --cookies=\"{cookiePath}\" -f \"{formatSelector}\"",
+                        ArgumentList = { $"{url}", "-o", "-", $"--cookies={cookiePath}", "-f", formatSelector },
                         RedirectStandardOutput = true,
                         UseShellExecute = false,
                         CreateNoWindow = true
