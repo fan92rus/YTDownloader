@@ -28,10 +28,10 @@ jobs:
         run: dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o out
 
       - name: Create data folder
-        run: New-Item -ItemType File -Path ./out/data/cookie.txt
+        run: New-Item -ItemType Directory -Path ./out/data -Force
 
       - name: Add dummy file to data folder
-        run: New-Item -ItemType File -Path ./out/data/.keep
+        run: New-Item -ItemType File -Path ./out/data/cookie.txt
 
       - name: Archive executable
         run: Compress-Archive -Path ./out/* -DestinationPath yt_downloader.zip
