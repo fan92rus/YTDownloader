@@ -37,7 +37,7 @@ namespace YT_Downloader.Controllers
 
             Console.WriteLine($"Page Title: {title}");
 
-            var cookiePath = Environment.GetEnvironmentVariable("COOKIE_PATH") ?? "/app/data/cookie.txt";
+            var cookiePath = Environment.GetEnvironmentVariable("COOKIE_PATH") ?? "./data/cookie.txt";
 
             try
             {

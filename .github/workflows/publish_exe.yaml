@@ -27,6 +27,9 @@ jobs:
       - name: Build Release
         run: dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o out
 
+      - name: Create data folder
+        run: New-Item -ItemType Directory -Path ./out/data
+
       - name: Archive executable
         run: Compress-Archive -Path ./out/* -DestinationPath yt_downloader.zip
 
