@@ -15,7 +15,6 @@
         "launchBrowser": true,
         "applicationUrl": "http://localhost:5108",
         "environmentVariables": {
-          "ASPNETCORE_ENVIRONMENT": "Development",
           "COOKIE_PATH": "C:/ytdlp/cookies.txt"
         }
       },
