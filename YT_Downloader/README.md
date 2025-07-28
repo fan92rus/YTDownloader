@@ -1,5 +1,7 @@
 # YouTube Downloader
 
+[Русская версия](README.ru.md)
+
 A Blazor application for downloading videos from YouTube.
 
 ## Features
@@ -11,60 +13,30 @@ A Blazor application for downloading videos from YouTube.
 - .NET 8.0 SDK or later
 - Docker (for containerized deployment)
 
-## Setup and Installation
-
-1. Clone the repository:
-   ```
-   git clone https://github.com/fan92rus/YTDownloader.git
-   ```
-
-2. Navigate to the project directory:
-   ```
-   cd YT_Downloader
-   ```
-
-3. Restore dependencies:
-   ```
-   dotnet restore
-   ```
-
-4. Build the application:
-   ```
-   dotnet build
-   ```
-
 ## Running the Application
-
-### Local Development
-1. Run the application:
-   ```
-   dotnet run --project YT_Downloader.csproj
-   ```
-
-2. Open your browser and navigate to `https://localhost:5001`
 
 ### Docker Deployment
 
-#### Using Dockerfile
-1. Build the Docker image:
+#### Using Pre-built Image from GitHub Container Registry
+1. Pull the latest image from GitHub Container Registry:
    ```
-   docker build -t ytdownloader .
+   docker pull ghcr.io/fan92rus/yt_downloader:latest
    ```
 
 2. Run the container with cookie folder mounted:
    ```
-   docker run -d -p 8080:80 --name ytdownloader_container -v ./data:/app/data ytdownloader
+   docker run -d -p 8080:80 --name ytdownloader_container -v ./data:/app/data ghcr.io/fan92rus/yt_downloader:latest
    ```
 
 3. Open your browser and navigate to `http://localhost:8080`
 
-#### Using Docker Compose
+#### Using Docker Compose (with pre-built image)
 1. Create a docker-compose.yml file with the following content:
    ```yaml
    version: '3.8'
    services:
      ytdownloader:
-       build: .
+       image: ghcr.io/fan92rus/yt_downloader:latest
        ports:
          - "8080:80"
        volumes:
@@ -74,6 +46,19 @@ A Blazor application for downloading videos from YouTube.
 2. Run the application with docker-compose:
    ```
    docker-compose up -d
+   ```
+
+3. Open your browser and navigate to `http://localhost:8080`
+
+#### Using Dockerfile (for custom builds)
+1. Build the Docker image:
+   ```
+   docker build -t ytdownloader .
+   ```
+
+2. Run the container with cookie folder mounted:
+   ```
+   docker run -d -p 8080:80 --name ytdownloader_container -v ./data:/app/data ytdownloader
    ```
 
 3. Open your browser and navigate to `http://localhost:8080`
@@ -109,7 +94,3 @@ Contributions are welcome! Please follow these steps:
 4. Commit your changes (`git commit -am 'Add some feature'`)
 5. Push to the branch (`git push origin feature-branch`)
 6. Create a new Pull Request
-
-## License
-
-This project is licensed under the MIT License.
