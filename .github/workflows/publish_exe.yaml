@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest  # ✅ Переключение на Linux runner
 
     steps:
       - name: Checkout source
@@ -25,13 +25,19 @@ jobs:
         run: dotnet restore
 
       - name: Build Release
-        run: dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o out
+        run: |
+          dotnet publish -c Release -r linux-x64 --self-contained true \
+            -p:PublishSingleFile=true \
+            -p:IncludeNativeLibrariesForSelfExtract=true \
+            -o out
 
       - name: Create data folder
-        run: New-Item -ItemType Directory -Path ./out/data
+        run: |
+            mkdir -p out/data
+            ls out/data
 
       - name: Archive executable
-        run: Compress-Archive -Path ./out/* -DestinationPath yt_downloader.zip
+        run: zip -r yt_downloader.zip out
 
       - name: Upload Release Artifact
         uses: softprops/action-gh-release@v2
