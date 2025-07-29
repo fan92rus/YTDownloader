@@ -4,6 +4,8 @@
 
 A Blazor application for downloading videos from YouTube.
 
+<img width="613" height="325" alt="image" src="https://github.com/user-attachments/assets/a186fa38-7ae1-4d6e-97b1-0125479adced" />
+
 ## Features
 - Download videos in various formats
 - Manage cookies for authentication
